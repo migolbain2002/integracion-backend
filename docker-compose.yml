@@ -1,0 +1,40 @@
+version: "3"
+services:
+  mysql-container:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Poligran2023*
+      MYSQL_DATABASE: integracion-continua
+      MYSQL_USER: AdminUser
+      MYSQL_PASSWORD: Poligran2023*
+      MYSQL_ALLOW_CLEARTEXT_PLUGIN: "true"
+      MYSQL_SSL_MODE: "DISABLED"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin-container:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: mysql-container
+      MYSQL_ROOT_PASSWORD: Poligran2023*
+
+  spring-boot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8081:8081
+    depends_on:
+      - mysql-container
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/integracion-continua?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Poligran2023*
+volumes:
+  mysql_data:
